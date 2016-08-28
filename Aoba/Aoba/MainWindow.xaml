@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Aoba"
         mc:Ignorable="d"
-        Title="Aoba"  Width="240" Topmost="True" SizeToContent="Height">
+        Title="Aoba"  Width="240" Topmost="True" SizeToContent="Height" ShowInTaskbar="False" WindowStyle="ToolWindow">
 
     <Window.Resources>
         <Style TargetType="Button">
