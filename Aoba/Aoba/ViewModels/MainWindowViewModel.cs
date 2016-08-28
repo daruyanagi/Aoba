@@ -17,11 +17,30 @@ namespace Aoba.ViewModels
     class MainWindowViewModel : ViewModelBase
     {
         public ICommand DetectCommand { get; private set; }
-        public ICommand CaptureCommand { get; private set; }
+        public ICommand SingleCaptureCommand { get; private set; }
+        public ICommand BurstCaptureCommand { get; private set; }
         public ICommand OpenCommand { get; private set; }
+
+        Timer BurstTimer = new Timer();
 
         public MainWindowViewModel()
         {
+            BurstCaptureInterval = 1000;
+
+            BurstTimer.Tick += (sender, args) =>
+            {
+                var path = GenerateFilePath();
+
+                try
+                {
+                    CaptureGameArea(path);
+                }
+                catch
+                {
+                    BurstTimer.Stop();
+                }
+            };
+
             DetectCommand = new DelegateCommand(_ => {
                 var bitmap = CaptureDesktop(SelectedDesktop);
 
@@ -30,42 +49,60 @@ namespace Aoba.ViewModels
                     Rectangle = DetectGameArea(bitmap);
                     ClearErrror("DetectGameArea()");
                     CanCapture = true;
+
+                    if (notify)
+                    {
+                        NotifyMessage("Game Area is detected successfully.");
+                    }
                 }
                 catch (Exception e)
                 {
                     SetError("DetectGameArea()", e.Message);
+                    NotifyMessage(e.Message);
                     CanCapture = false;
                 }
             });
 
-            CaptureCommand = new DelegateCommand(_ =>
+            SingleCaptureCommand = new DelegateCommand(_ =>
             {
-                var bitmap = CaptureDesktop(SelectedDesktop);
-
-                bitmap = bitmap.Clone(Rectangle, bitmap.PixelFormat);
-
                 var path = GenerateFilePath();
-                bitmap.Save(path);
 
-                if (notify)
+                try
                 {
-                    var toastXml = ToastNotificationManager.GetTemplateContent(ToastTemplateType.ToastImageAndText04);
+                    CaptureGameArea(path);
 
-                    var stringElements = toastXml.GetElementsByTagName("text");
-                    stringElements[0].AppendChild(toastXml.CreateTextNode(path + " is saved."));
+                    if (notify)
+                    {
+                        NotifyScreenshotSaved(path);
+                    }
+                }
+                catch (Exception e)
+                {
+                    NotifyMessage(e.Message);
+                }
+            }, _ => CanCapture);
 
-                    var imagePath = "file:///" + Path.GetFullPath(path);
-                    var imageElements = toastXml.GetElementsByTagName("image");
-                    imageElements[0].Attributes.GetNamedItem("src").NodeValue = imagePath;
+            BurstCaptureCommand = new DelegateCommand(_ =>
+            {
+                if (BurstTimer.Enabled)
+                {
+                    BurstTimer.Stop();
+                    BurstCaptureButtonBackgroundBrush = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Colors.Black);
 
-                    ToastNotification toast = new ToastNotification(toastXml);
-                    toast.Activated += (sender, args) => { System.Diagnostics.Process.Start("explorer", @"/select," + path); };
-                    toast.Dismissed += (sender, args) => { };
-                    toast.Failed += (sender, args) => { };
+                    if (notify)
+                    {
+                        NotifyMessage("Burst capture is stopped.");
+                    }
+                }
+                else
+                {
+                    BurstTimer.Start();
+                    BurstCaptureButtonBackgroundBrush = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Colors.Orange);
 
-                    const string APP_ID = "Daruyanagi.Aoba";
-
-                    ToastNotificationManager.CreateToastNotifier(APP_ID).Show(toast);
+                    if (notify)
+                    {
+                        NotifyMessage("Burst capture is started.");
+                    }
                 }
             }, _ => CanCapture);
 
@@ -73,6 +110,77 @@ namespace Aoba.ViewModels
             {
                 System.Diagnostics.Process.Start(StoragePath);
             });
+        }
+
+        private void NotifyScreenshotSaved(string path)
+        {
+            var toastXml = ToastNotificationManager.GetTemplateContent(ToastTemplateType.ToastImageAndText04);
+
+            var stringElements = toastXml.GetElementsByTagName("text");
+            stringElements[0].AppendChild(toastXml.CreateTextNode(path + " is saved."));
+
+            var imagePath = "file:///" + Path.GetFullPath(path);
+            var imageElements = toastXml.GetElementsByTagName("image");
+            imageElements[0].Attributes.GetNamedItem("src").NodeValue = imagePath;
+
+            ToastNotification toast = new ToastNotification(toastXml);
+            toast.Activated += (sender, args) => { System.Diagnostics.Process.Start("explorer", @"/select," + path); };
+            toast.Dismissed += (sender, args) => { };
+            toast.Failed += (sender, args) => { };
+
+            const string APP_ID = "Daruyanagi.Aoba";
+
+            ToastNotificationManager.CreateToastNotifier(APP_ID).Show(toast);
+        }
+
+        private void NotifyMessage(string message)
+        {
+            var toastXml = ToastNotificationManager.GetTemplateContent(ToastTemplateType.ToastImageAndText04);
+
+            var stringElements = toastXml.GetElementsByTagName("text");
+            stringElements[0].AppendChild(toastXml.CreateTextNode(message));
+
+            var imagePath = "file:///" + Path.GetFullPath("Aoba.png");
+            var imageElements = toastXml.GetElementsByTagName("image");
+            imageElements[0].Attributes.GetNamedItem("src").NodeValue = imagePath;
+
+            ToastNotification toast = new ToastNotification(toastXml);
+            toast.Activated += (sender, args) => { System.Diagnostics.Process.Start("explorer", StoragePath); };
+            toast.Dismissed += (sender, args) => { };
+            toast.Failed += (sender, args) => { };
+
+            const string APP_ID = "Daruyanagi.Aoba";
+
+            ToastNotificationManager.CreateToastNotifier(APP_ID).Show(toast);
+        }
+
+        private void CaptureGameArea(string path)
+        {
+            var bitmap = CaptureDesktop(SelectedDesktop);
+
+            bitmap = bitmap.Clone(Rectangle, bitmap.PixelFormat);
+            
+            bitmap.Save(path);
+        }
+
+        private System.Windows.Media.Brush burstCaptureButtonBackgroundBrush = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Colors.Black);
+
+        public System.Windows.Media.Brush BurstCaptureButtonBackgroundBrush
+        {
+            get { return burstCaptureButtonBackgroundBrush; }
+            set { SetProperty(ref burstCaptureButtonBackgroundBrush, value); }
+        }
+
+        public int BurstCaptureInterval
+        {
+            get { return BurstTimer.Interval; }
+            set
+            {
+                if (BurstTimer.Interval == value) return;
+
+                BurstTimer.Interval = value;
+                RaisePropertyChanged();
+            }
         }
 
         private Rectangle rectangle;
@@ -204,7 +312,7 @@ namespace Aoba.ViewModels
                             desktop.GetPixel(x, y + h + 1).Name == "ffffffff" &&
                             desktop.GetPixel(x + w + 1, y + h + 1).Name == "ffffffff")
                         {
-                            return new Rectangle(x, y, w, h);
+                            if (w > h) return new Rectangle(x, y, w, h);
                         }
                     }
                 }
