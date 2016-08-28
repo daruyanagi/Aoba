@@ -20,7 +20,7 @@ public abstract class ViewModelBase : INotifyPropertyChanged, IDataErrorInfo
     public event PropertyChangedEventHandler PropertyChanged;
 
     // INotifyPropertyChanged.PropertyChangedイベントを発生させる。
-    protected virtual void RaisePropertyChanged(string propertyName)
+    protected virtual void RaisePropertyChanged([CallerMemberName] string propertyName = "")
     {
         if (PropertyChanged != null)
             PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
