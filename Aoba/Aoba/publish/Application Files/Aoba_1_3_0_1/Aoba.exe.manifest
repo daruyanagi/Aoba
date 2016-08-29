@@ -1,0 +1,149 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<asmv1:assembly xsi:schemaLocation="urn:schemas-microsoft-com:asm.v1 assembly.adaptive.xsd" manifestVersion="1.0" xmlns:asmv1="urn:schemas-microsoft-com:asm.v1" xmlns="urn:schemas-microsoft-com:asm.v2" xmlns:asmv2="urn:schemas-microsoft-com:asm.v2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:co.v1="urn:schemas-microsoft-com:clickonce.v1" xmlns:asmv3="urn:schemas-microsoft-com:asm.v3" xmlns:dsig="http://www.w3.org/2000/09/xmldsig#" xmlns:co.v2="urn:schemas-microsoft-com:clickonce.v2">
+  <asmv1:assemblyIdentity name="Aoba.exe" version="1.3.0.1" publicKeyToken="d6692896cd08f63c" language="neutral" processorArchitecture="msil" type="win32" />
+  <description asmv2:iconFile="Aoba.ico" xmlns="urn:schemas-microsoft-com:asm.v1" />
+  <application />
+  <entryPoint>
+    <assemblyIdentity name="Aoba" version="1.3.0.0" language="neutral" processorArchitecture="msil" />
+    <commandLine file="Aoba.exe" parameters="" />
+  </entryPoint>
+  <trustInfo>
+    <security>
+      <applicationRequestMinimum>
+        <PermissionSet Unrestricted="true" ID="Custom" SameSite="site" />
+        <defaultAssemblyRequest permissionSetReference="Custom" />
+      </applicationRequestMinimum>
+      <requestedPrivileges xmlns="urn:schemas-microsoft-com:asm.v3">
+        <!--
+          UAC マニフェスト オプション
+          Windows のユーザー アカウント制御のレベルを変更するには、
+          requestedExecutionLevel ノードを以下のいずれかで置換します。
+
+        <requestedExecutionLevel  level="asInvoker" uiAccess="false" />
+        <requestedExecutionLevel  level="requireAdministrator" uiAccess="false" />
+        <requestedExecutionLevel  level="highestAvailable" uiAccess="false" />
+
+         下位互換性を保つためにファイルおよびレジストリの仮想化を使用する場合、
+         requestedExecutionLevel ノードを削除します。
+    -->
+        <requestedExecutionLevel level="asInvoker" uiAccess="false" />
+      </requestedPrivileges>
+    </security>
+  </trustInfo>
+  <dependency>
+    <dependentOS>
+      <osVersionInfo>
+        <os majorVersion="5" minorVersion="1" buildNumber="2600" servicePackMajor="0" />
+      </osVersionInfo>
+    </dependentOS>
+  </dependency>
+  <dependency>
+    <dependentAssembly dependencyType="preRequisite" allowDelayedBinding="true">
+      <assemblyIdentity name="Microsoft.Windows.CommonLanguageRuntime" version="4.0.30319.0" />
+    </dependentAssembly>
+  </dependency>
+  <dependency>
+    <dependentAssembly dependencyType="preRequisite" allowDelayedBinding="true">
+      <assemblyIdentity name="System.Runtime.WindowsRuntime" version="4.0.0.0" publicKeyToken="B77A5C561934E089" language="neutral" processorArchitecture="msil" />
+    </dependentAssembly>
+  </dependency>
+  <dependency>
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="Aoba.exe" size="30200">
+      <assemblyIdentity name="Aoba" version="1.3.0.0" language="neutral" processorArchitecture="msil" />
+      <hash>
+        <dsig:Transforms>
+          <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
+        </dsig:Transforms>
+        <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
+        <dsig:DigestValue>Dz92wIecZEhNuUIXZIzWZaJNwkFIJPX1Mi8pUHneLB8=</dsig:DigestValue>
+      </hash>
+    </dependentAssembly>
+  </dependency>
+  <dependency>
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="NAudio.dll" size="471040">
+      <assemblyIdentity name="NAudio" version="1.7.3.0" language="neutral" processorArchitecture="msil" />
+      <hash>
+        <dsig:Transforms>
+          <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
+        </dsig:Transforms>
+        <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
+        <dsig:DigestValue>My2cr5wBcqq9f/jKkJln0x3Bcym2S2XR+xO4TGylpyk=</dsig:DigestValue>
+      </hash>
+    </dependentAssembly>
+  </dependency>
+  <dependency>
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="Screna.dll" size="40960">
+      <assemblyIdentity name="Screna" version="0.5.0.0" language="neutral" processorArchitecture="msil" />
+      <hash>
+        <dsig:Transforms>
+          <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
+        </dsig:Transforms>
+        <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
+        <dsig:DigestValue>CCc6OTpZRtGzV/rq8Xp1BP+bleIIYwTokWGURv374Ng=</dsig:DigestValue>
+      </hash>
+    </dependentAssembly>
+  </dependency>
+  <dependency>
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="Screna.NAudio.dll" size="10240">
+      <assemblyIdentity name="Screna.NAudio" version="0.0.0.0" language="neutral" processorArchitecture="msil" />
+      <hash>
+        <dsig:Transforms>
+          <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
+        </dsig:Transforms>
+        <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
+        <dsig:DigestValue>mLqp217aUL4MNPd+YFimtMnQIV3XSBaVm86Fgq2mefY=</dsig:DigestValue>
+      </hash>
+    </dependentAssembly>
+  </dependency>
+  <dependency>
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="Screna.SharpAvi.dll" size="12800">
+      <assemblyIdentity name="Screna.SharpAvi" version="0.0.0.0" language="neutral" processorArchitecture="msil" />
+      <hash>
+        <dsig:Transforms>
+          <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
+        </dsig:Transforms>
+        <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
+        <dsig:DigestValue>JQCeiieszbyxsd9Rf/Dw+i78SBSQOmKhOUovFyl3VSI=</dsig:DigestValue>
+      </hash>
+    </dependentAssembly>
+  </dependency>
+  <dependency>
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="SharpAvi.dll" size="77824">
+      <assemblyIdentity name="SharpAvi" version="2.1.0.0" language="neutral" processorArchitecture="msil" />
+      <hash>
+        <dsig:Transforms>
+          <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
+        </dsig:Transforms>
+        <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
+        <dsig:DigestValue>iNU7h926y+/B/rrp7DfT7kum9e8T7TocohQp+PYbnHo=</dsig:DigestValue>
+      </hash>
+    </dependentAssembly>
+  </dependency>
+  <file name="Aoba.exe.config" size="189">
+    <hash>
+      <dsig:Transforms>
+        <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
+      </dsig:Transforms>
+      <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
+      <dsig:DigestValue>6N7MliNbVJSIAIPrecIshMbZ7zEoKLr5SQvud4LDUOw=</dsig:DigestValue>
+    </hash>
+  </file>
+  <file name="Aoba.ico" size="727">
+    <hash>
+      <dsig:Transforms>
+        <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
+      </dsig:Transforms>
+      <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
+      <dsig:DigestValue>QigSL+SWTzTmRldz6IP7eM9yA7CPc018fGbiFsAI0Uw=</dsig:DigestValue>
+    </hash>
+  </file>
+  <file name="Aoba.png" size="705">
+    <hash>
+      <dsig:Transforms>
+        <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
+      </dsig:Transforms>
+      <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
+      <dsig:DigestValue>tnajvJ9/SLGEEHn84pHxput3MfW/+XVGKKmzMgzn95U=</dsig:DigestValue>
+    </hash>
+  </file>
+<publisherIdentity name="CN=DESKTOP-NVCG3EG\Hidetoshi" issuerKeyHash="bbef9b1fb332a8750d6e6d1c02a6f3edca2e1cc3" /><Signature Id="StrongNameSignature" xmlns="http://www.w3.org/2000/09/xmldsig#"><SignedInfo><CanonicalizationMethod Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#" /><SignatureMethod Algorithm="http://www.w3.org/2000/09/xmldsig#rsa-sha256" /><Reference URI=""><Transforms><Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature" /><Transform Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#" /></Transforms><DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" /><DigestValue>kYsv9Kfpb6BSqO39zOx/GckhBfdKlqfOZV+IbfzgXZs=</DigestValue></Reference></SignedInfo><SignatureValue>Cd3Lnb1q6ciCYilWQqz968wZ/zNh6hk3PKX1671f3rhub37BrvKBmw7cHOvPd3t7CU2MeyxehVIjT7PdDFRyJ4LplIlvzBEfyhFmhYECCV/9pd11zZwkUJjBhTLweMvCWcCL2RIzljf+KdLjJ/pUEVzj1+Nn9nAwKzI6+hWjbUU=</SignatureValue><KeyInfo Id="StrongNameKeyInfo"><KeyValue><RSAKeyValue><Modulus>u0pbp9bRCeURzOt1TzaH6jCJ072O4lqSDg8rHPe/O33keMvZMq4fL1IB/yqk74ix9j38zJcgmT3NLbUqovARcZuEPKyUoHC23o8bdfRtf+8k3dKNXTGerrzUvG8A82BJI1saWGLE0hlLB9kHORCw4Ohm6EFOxajtVCvD7jOfhzs=</Modulus><Exponent>AQAB</Exponent></RSAKeyValue></KeyValue><msrel:RelData xmlns:msrel="http://schemas.microsoft.com/windows/rel/2005/reldata"><r:license xmlns:r="urn:mpeg:mpeg21:2003:01-REL-R-NS" xmlns:as="http://schemas.microsoft.com/windows/pki/2005/Authenticode"><r:grant><as:ManifestInformation Hash="9b5de0fc6d885f65cea7964af70521c9197fecccfdeda852a06fe9a7f42f8b91" Description="" Url=""><as:assemblyIdentity name="Aoba.exe" version="1.3.0.1" publicKeyToken="d6692896cd08f63c" language="neutral" processorArchitecture="msil" type="win32" /></as:ManifestInformation><as:SignedBy /><as:AuthenticodePublisher><as:X509SubjectName>CN=DESKTOP-NVCG3EG\Hidetoshi</as:X509SubjectName></as:AuthenticodePublisher></r:grant><r:issuer><Signature Id="AuthenticodeSignature" xmlns="http://www.w3.org/2000/09/xmldsig#"><SignedInfo><CanonicalizationMethod Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#" /><SignatureMethod Algorithm="http://www.w3.org/2000/09/xmldsig#rsa-sha256" /><Reference URI=""><Transforms><Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature" /><Transform Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#" /></Transforms><DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" /><DigestValue>uwHUDTw5wr+zvcyA40GJepDwQ3fvpDXXqzsHkQJOg+4=</DigestValue></Reference></SignedInfo><SignatureValue>kFwmxx52s3QjmsISga9egToWu35V0SLoePLQia5IrjpGKu7MuUKiieFSWuUeJQ5ZWi0d84r9luN1fUswbib7Bp82xx+3oShqm3Ta6KQGBsK8Zzq5ILnFOhgV5JrHLpvQn/3I5LJnNozCQJnhN28rLR8UaKMxR7gAsb4m9eDEH88=</SignatureValue><KeyInfo><KeyValue><RSAKeyValue><Modulus>u0pbp9bRCeURzOt1TzaH6jCJ072O4lqSDg8rHPe/O33keMvZMq4fL1IB/yqk74ix9j38zJcgmT3NLbUqovARcZuEPKyUoHC23o8bdfRtf+8k3dKNXTGerrzUvG8A82BJI1saWGLE0hlLB9kHORCw4Ohm6EFOxajtVCvD7jOfhzs=</Modulus><Exponent>AQAB</Exponent></RSAKeyValue></KeyValue><X509Data><X509Certificate>MIIB/TCCAWagAwIBAgIQJevb+imciaxACo1exVwKFDANBgkqhkiG9w0BAQsFADA9MTswOQYDVQQDHjIARABFAFMASwBUAE8AUAAtAE4AVgBDAEcAMwBFAEcAXABIAGkAZABlAHQAbwBzAGgAaTAeFw0xNjA4MjkxOTE0MDhaFw0xNzA4MzAwMTE0MDhaMD0xOzA5BgNVBAMeMgBEAEUAUwBLAFQATwBQAC0ATgBWAEMARwAzAEUARwBcAEgAaQBkAGUAdABvAHMAaABpMIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQC7Slun1tEJ5RHM63VPNofqMInTvY7iWpIODysc9787feR4y9kyrh8vUgH/KqTviLH2PfzMlyCZPc0ttSqi8BFxm4Q8rJSgcLbejxt19G1/7yTd0o1dMZ6uvNS8bwDzYEkjWxpYYsTSGUsH2Qc5ELDg6GboQU7FqO1UK8PuM5+HOwIDAQABMA0GCSqGSIb3DQEBCwUAA4GBABy8SWyP7HUaYfTob4zSQHhHZN1zz05pzMkNA5aieWZLWyun6m3aQpaMVpdLbDQsHNedQIPiBaAVQSq3XIXuia+DeM80j+QGAZRB86pI7kqSejQmD1kH9s/QnjWVvXbP0a5EW05TmlOgwGMG4UA9mT0upBJu2XoFJ4zySsik05Xb</X509Certificate></X509Data></KeyInfo></Signature></r:issuer></r:license></msrel:RelData></KeyInfo></Signature></asmv1:assembly>
