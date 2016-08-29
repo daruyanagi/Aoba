@@ -1,4 +1,8 @@
-﻿using System;
+﻿using Screna;
+using Screna.Audio;
+using Screna.Avi;
+using Screna.NAudio;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
@@ -19,9 +23,13 @@ namespace Aoba.ViewModels
         public ICommand DetectCommand { get; private set; }
         public ICommand SingleCaptureCommand { get; private set; }
         public ICommand BurstCaptureCommand { get; private set; }
-        public ICommand OpenCommand { get; private set; }
+        public ICommand VideoCaptureCommand { get; private set; }
+        public ICommand OpenPictureFolderCommand { get; private set; }
+        public ICommand OpenVideoFolderCommand { get; private set; }
 
         Timer BurstTimer = new Timer();
+        Recorder recorder = null;
+        string videoPath = string.Empty;
 
         public MainWindowViewModel()
         {
@@ -29,7 +37,7 @@ namespace Aoba.ViewModels
 
             BurstTimer.Tick += (sender, args) =>
             {
-                var path = GenerateFilePath();
+                var path = GeneratePicturePath();
 
                 try
                 {
@@ -63,9 +71,47 @@ namespace Aoba.ViewModels
                 }
             });
 
+            VideoCaptureCommand = new DelegateCommand(_ =>
+            {
+                // video - c# Screna: How do I define screen area? - Stack Overflow
+                // http://stackoverflow.com/questions/35505744/c-sharp-screna-how-do-i-define-screen-area
+
+                if (recorder == null)
+                {
+                    videoPath = GenerateVideoPath();
+                    var writer = new AviWriter(videoPath, AviCodec.MotionJpeg);
+                    var videoProvider = new RegionProvider(Rectangle);
+                    var audioProvider = new LoopbackProvider();
+
+                    recorder = new Recorder(writer, videoProvider, FrameRate, audioProvider);
+
+                    recorder.Start();
+
+                    VideoCaptureButtonBackgroundBrush = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Colors.Orange);
+
+                    if (notify)
+                    {
+                        //
+                    }
+                }
+                else
+                {
+                    recorder.Stop();
+
+                    recorder = null;
+
+                    VideoCaptureButtonBackgroundBrush = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Colors.Black);
+
+                    if (notify)
+                    {
+                        NotifyVideoSaved(videoPath);
+                    }
+                }
+            }, _ => CanCapture && SelectedDesktop == 0);
+
             SingleCaptureCommand = new DelegateCommand(_ =>
             {
-                var path = GenerateFilePath();
+                var path = GeneratePicturePath();
 
                 try
                 {
@@ -106,9 +152,14 @@ namespace Aoba.ViewModels
                 }
             }, _ => CanCapture);
 
-            OpenCommand = new DelegateCommand(_ =>
+            OpenPictureFolderCommand = new DelegateCommand(_ =>
             {
-                System.Diagnostics.Process.Start(StoragePath);
+                System.Diagnostics.Process.Start(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyPictures), "Aoba"));
+            });
+
+            OpenVideoFolderCommand = new DelegateCommand(_ =>
+            {
+                System.Diagnostics.Process.Start(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyVideos), "Aoba"));
             });
         }
 
@@ -120,6 +171,27 @@ namespace Aoba.ViewModels
             stringElements[0].AppendChild(toastXml.CreateTextNode(path + " is saved."));
 
             var imagePath = "file:///" + Path.GetFullPath(path);
+            var imageElements = toastXml.GetElementsByTagName("image");
+            imageElements[0].Attributes.GetNamedItem("src").NodeValue = imagePath;
+
+            ToastNotification toast = new ToastNotification(toastXml);
+            toast.Activated += (sender, args) => { System.Diagnostics.Process.Start("explorer", @"/select," + path); };
+            toast.Dismissed += (sender, args) => { };
+            toast.Failed += (sender, args) => { };
+
+            const string APP_ID = "Daruyanagi.Aoba";
+
+            ToastNotificationManager.CreateToastNotifier(APP_ID).Show(toast);
+        }
+
+        private void NotifyVideoSaved(string path)
+        {
+            var toastXml = ToastNotificationManager.GetTemplateContent(ToastTemplateType.ToastImageAndText04);
+
+            var stringElements = toastXml.GetElementsByTagName("text");
+            stringElements[0].AppendChild(toastXml.CreateTextNode(path + " is saved."));
+
+            var imagePath = "file:///" + Path.GetFullPath("Aoba.png");
             var imageElements = toastXml.GetElementsByTagName("image");
             imageElements[0].Attributes.GetNamedItem("src").NodeValue = imagePath;
 
@@ -145,7 +217,7 @@ namespace Aoba.ViewModels
             imageElements[0].Attributes.GetNamedItem("src").NodeValue = imagePath;
 
             ToastNotification toast = new ToastNotification(toastXml);
-            toast.Activated += (sender, args) => { System.Diagnostics.Process.Start("explorer", StoragePath); };
+            toast.Activated += (sender, args) => { System.Diagnostics.Process.Start("explorer", PictureStoragePath); };
             toast.Dismissed += (sender, args) => { };
             toast.Failed += (sender, args) => { };
 
@@ -171,6 +243,14 @@ namespace Aoba.ViewModels
             set { SetProperty(ref burstCaptureButtonBackgroundBrush, value); }
         }
 
+        private System.Windows.Media.Brush videoCaptureButtonBackgroundBrush = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Colors.Black);
+
+        public System.Windows.Media.Brush VideoCaptureButtonBackgroundBrush
+        {
+            get { return videoCaptureButtonBackgroundBrush; }
+            set { SetProperty(ref videoCaptureButtonBackgroundBrush, value); }
+        }
+
         public int BurstCaptureInterval
         {
             get { return BurstTimer.Interval; }
@@ -181,6 +261,14 @@ namespace Aoba.ViewModels
                 BurstTimer.Interval = value;
                 RaisePropertyChanged();
             }
+        }
+
+        private int frameRate = 10;
+
+        public int FrameRate
+        {
+            get { return frameRate; }
+            set { SetProperty(ref frameRate, value);  }
         }
 
         private Rectangle rectangle;
@@ -217,10 +305,16 @@ namespace Aoba.ViewModels
         public int SelectedDesktop
         {
             get { return selectedDesktop; }
-            set { SetProperty(ref selectedDesktop, value); }
+            set
+            {
+                SetProperty(ref selectedDesktop, value);
+
+                CanCapture = false;
+                Rectangle = Rectangle.Empty;
+            }
         }
 
-        public string StoragePath
+        public string PictureStoragePath
         {
             get
             {
@@ -236,12 +330,38 @@ namespace Aoba.ViewModels
             }
         }
 
-        public string GenerateFilePath()
+        public string VideoStoragePath
         {
-            var path = StoragePath;
+            get
+            {
+                var path = System.Environment.GetFolderPath(Environment.SpecialFolder.MyVideos);
+
+                path = Path.Combine(path, "Aoba");
+
+                path = Path.Combine(path, DateTime.Now.ToString("yyyy-MM-dd"));
+
+                if (!Directory.Exists(path)) Directory.CreateDirectory(path);
+
+                return path;
+            }
+        }
+
+        public string GeneratePicturePath(string extension = "png")
+        {
+            var path = PictureStoragePath;
 
             path = System.IO.Path.Combine(path, DateTime.Now.ToString("HHmmss-ff"));
-            path = System.IO.Path.ChangeExtension(path, "png");
+            path = System.IO.Path.ChangeExtension(path, extension);
+
+            return path;
+        }
+
+        public string GenerateVideoPath(string extension = "avi")
+        {
+            var path = VideoStoragePath;
+
+            path = System.IO.Path.Combine(path, DateTime.Now.ToString("HHmmss-ff"));
+            path = System.IO.Path.ChangeExtension(path, extension);
 
             return path;
         }
