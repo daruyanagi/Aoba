@@ -1,4 +1,5 @@
-﻿using Screna;
+﻿using CoreTweet;
+using Screna;
 using Screna.Audio;
 using Screna.Avi;
 using Screna.NAudio;
@@ -15,6 +16,7 @@ using System.Windows.Forms;
 using System.Windows.Input;
 using System.Xml;
 using Windows.UI.Notifications;
+using Media = System.Windows.Media;
 
 namespace Aoba.ViewModels
 {
@@ -26,10 +28,15 @@ namespace Aoba.ViewModels
         public ICommand VideoCaptureCommand { get; private set; }
         public ICommand OpenPictureFolderCommand { get; private set; }
         public ICommand OpenVideoFolderCommand { get; private set; }
+        public ICommand TwitterAuthorizeCommand { get; private set; }
+        public ICommand TwitterPostCommand { get; private set; }
 
         Timer BurstTimer = new Timer();
         Recorder recorder = null;
         string videoPath = string.Empty;
+
+        Models.TwitterProviderModel twitter = Models.TwitterProviderModel.GetInstance();
+        Models.NotifyProviderModel notify = Models.NotifyProviderModel.GetInstance();
 
         public MainWindowViewModel()
         {
@@ -48,25 +55,23 @@ namespace Aoba.ViewModels
                     BurstTimer.Stop();
                 }
             };
+            
+            CanTwitter = twitter.Initialize();
 
-            DetectCommand = new DelegateCommand(_ => {
+            DetectCommand = new DelegateCommand(_ =>
+            {
                 var bitmap = CaptureDesktop(SelectedDesktop);
 
                 try
                 {
                     Rectangle = DetectGameArea(bitmap);
-                    ClearErrror("DetectGameArea()");
+                    
+                    notify.Toast("Game Area is detected successfully.", "Aoba.png");
                     CanCapture = true;
-
-                    if (notify)
-                    {
-                        NotifyMessage("Game Area is detected successfully.");
-                    }
                 }
                 catch (Exception e)
                 {
-                    SetError("DetectGameArea()", e.Message);
-                    NotifyMessage(e.Message);
+                    notify.Toast(e.Message, "Aoba.png");
                     CanCapture = false;
                 }
             });
@@ -87,12 +92,7 @@ namespace Aoba.ViewModels
 
                     recorder.Start();
 
-                    VideoCaptureButtonBackgroundBrush = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Colors.Orange);
-
-                    if (notify)
-                    {
-                        //
-                    }
+                    VideoCaptureButtonBackgroundBrush = new Media.SolidColorBrush(Media.Colors.Orange);
                 }
                 else
                 {
@@ -100,31 +100,23 @@ namespace Aoba.ViewModels
 
                     recorder = null;
 
-                    VideoCaptureButtonBackgroundBrush = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Colors.Black);
+                    VideoCaptureButtonBackgroundBrush = new Media.SolidColorBrush(Media.Colors.Black);
 
-                    if (notify)
-                    {
-                        NotifyVideoSaved(videoPath);
-                    }
+                    notify.Toast($"{videoPath} is saved.", "Aoba.png", (s, a) => { Process.Start("explorer", $"/select,\"{videoPath}\""); });
                 }
             }, _ => CanCapture && SelectedDesktop == 0);
 
             SingleCaptureCommand = new DelegateCommand(_ =>
             {
-                var path = GeneratePicturePath();
-
                 try
                 {
+                    var path = GeneratePicturePath();
                     CaptureGameArea(path);
-
-                    if (notify)
-                    {
-                        NotifyScreenshotSaved(path);
-                    }
+                    notify.Toast($"{path} is saved.", path, (s, a) => { Process.Start("explorer", $"/select,\"{path}\""); });
                 }
                 catch (Exception e)
                 {
-                    NotifyMessage(e.Message);
+                    notify.Toast(e.Message, "Aoba.png");
                 }
             }, _ => CanCapture);
 
@@ -133,97 +125,48 @@ namespace Aoba.ViewModels
                 if (BurstTimer.Enabled)
                 {
                     BurstTimer.Stop();
-                    BurstCaptureButtonBackgroundBrush = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Colors.Black);
+                    BurstCaptureButtonBackgroundBrush = new Media.SolidColorBrush(Media.Colors.Black);
 
-                    if (notify)
-                    {
-                        NotifyMessage("Burst capture is stopped.");
-                    }
+                    notify.Toast("Burst capture is stopped.", "Aoba.png", (s, a) => { Process.Start("explorer", PictureStoragePath); });
                 }
                 else
                 {
                     BurstTimer.Start();
-                    BurstCaptureButtonBackgroundBrush = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Colors.Orange);
+                    BurstCaptureButtonBackgroundBrush = new Media.SolidColorBrush(Media.Colors.Orange);
 
-                    if (notify)
-                    {
-                        NotifyMessage("Burst capture is started.");
-                    }
+                    notify.Toast("Burst capture is started.", "AobaPng", (s, a) => { Process.Start("explorer", PictureStoragePath); });
                 }
             }, _ => CanCapture);
 
             OpenPictureFolderCommand = new DelegateCommand(_ =>
             {
-                System.Diagnostics.Process.Start(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyPictures), "Aoba"));
+                Process.Start(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyPictures), "Aoba"));
             });
 
             OpenVideoFolderCommand = new DelegateCommand(_ =>
             {
-                System.Diagnostics.Process.Start(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyVideos), "Aoba"));
+                Process.Start(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyVideos), "Aoba"));
             });
-        }
 
-        private void NotifyScreenshotSaved(string path)
-        {
-            var toastXml = ToastNotificationManager.GetTemplateContent(ToastTemplateType.ToastImageAndText04);
+            TwitterAuthorizeCommand = new DelegateCommand(_ =>
+            {
+                var window = new Views.TwitterAuthWindow();
 
-            var stringElements = toastXml.GetElementsByTagName("text");
-            stringElements[0].AppendChild(toastXml.CreateTextNode(path + " is saved."));
+                window.ShowDialog();
+                
+                CanTwitter = twitter.IsEnabed;
+            });
 
-            var imagePath = "file:///" + Path.GetFullPath(path);
-            var imageElements = toastXml.GetElementsByTagName("image");
-            imageElements[0].Attributes.GetNamedItem("src").NodeValue = imagePath;
+            TwitterPostCommand = new DelegateCommand(
+                _ => {
+                    var path = GeneratePicturePath();
+                    CaptureGameArea(path);
 
-            ToastNotification toast = new ToastNotification(toastXml);
-            toast.Activated += (sender, args) => { System.Diagnostics.Process.Start("explorer", @"/select," + path); };
-            toast.Dismissed += (sender, args) => { };
-            toast.Failed += (sender, args) => { };
-
-            const string APP_ID = "Daruyanagi.Aoba";
-
-            ToastNotificationManager.CreateToastNotifier(APP_ID).Show(toast);
-        }
-
-        private void NotifyVideoSaved(string path)
-        {
-            var toastXml = ToastNotificationManager.GetTemplateContent(ToastTemplateType.ToastImageAndText04);
-
-            var stringElements = toastXml.GetElementsByTagName("text");
-            stringElements[0].AppendChild(toastXml.CreateTextNode(path + " is saved."));
-
-            var imagePath = "file:///" + Path.GetFullPath("Aoba.png");
-            var imageElements = toastXml.GetElementsByTagName("image");
-            imageElements[0].Attributes.GetNamedItem("src").NodeValue = imagePath;
-
-            ToastNotification toast = new ToastNotification(toastXml);
-            toast.Activated += (sender, args) => { System.Diagnostics.Process.Start("explorer", @"/select," + path); };
-            toast.Dismissed += (sender, args) => { };
-            toast.Failed += (sender, args) => { };
-
-            const string APP_ID = "Daruyanagi.Aoba";
-
-            ToastNotificationManager.CreateToastNotifier(APP_ID).Show(toast);
-        }
-
-        private void NotifyMessage(string message)
-        {
-            var toastXml = ToastNotificationManager.GetTemplateContent(ToastTemplateType.ToastImageAndText04);
-
-            var stringElements = toastXml.GetElementsByTagName("text");
-            stringElements[0].AppendChild(toastXml.CreateTextNode(message));
-
-            var imagePath = "file:///" + Path.GetFullPath("Aoba.png");
-            var imageElements = toastXml.GetElementsByTagName("image");
-            imageElements[0].Attributes.GetNamedItem("src").NodeValue = imagePath;
-
-            ToastNotification toast = new ToastNotification(toastXml);
-            toast.Activated += (sender, args) => { System.Diagnostics.Process.Start("explorer", PictureStoragePath); };
-            toast.Dismissed += (sender, args) => { };
-            toast.Failed += (sender, args) => { };
-
-            const string APP_ID = "Daruyanagi.Aoba";
-
-            ToastNotificationManager.CreateToastNotifier(APP_ID).Show(toast);
+                    var window = new Views.TwitterPostWindow(path);
+                    window.ShowDialog();
+                },
+                _ => CanTwitter && CanCapture
+            );
         }
 
         private void CaptureGameArea(string path)
@@ -235,17 +178,17 @@ namespace Aoba.ViewModels
             bitmap.Save(path);
         }
 
-        private System.Windows.Media.Brush burstCaptureButtonBackgroundBrush = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Colors.Black);
+        private Media.Brush burstCaptureButtonBackgroundBrush = new Media.SolidColorBrush(Media.Colors.Black);
 
-        public System.Windows.Media.Brush BurstCaptureButtonBackgroundBrush
+        public Media.Brush BurstCaptureButtonBackgroundBrush
         {
             get { return burstCaptureButtonBackgroundBrush; }
             set { SetProperty(ref burstCaptureButtonBackgroundBrush, value); }
         }
 
-        private System.Windows.Media.Brush videoCaptureButtonBackgroundBrush = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Colors.Black);
+        private Media.Brush videoCaptureButtonBackgroundBrush = new Media.SolidColorBrush(Media.Colors.Black);
 
-        public System.Windows.Media.Brush VideoCaptureButtonBackgroundBrush
+        public Media.Brush VideoCaptureButtonBackgroundBrush
         {
             get { return videoCaptureButtonBackgroundBrush; }
             set { SetProperty(ref videoCaptureButtonBackgroundBrush, value); }
@@ -287,12 +230,24 @@ namespace Aoba.ViewModels
             set { SetProperty(ref canCapture, value); }
         }
 
-        private bool notify = true;
+        private bool canTwitter = false;
 
-        public bool Notify
+        public bool CanTwitter
         {
-            get { return notify; }
-            set { SetProperty(ref notify, value); }
+            get { return canTwitter; }
+            set { SetProperty(ref canTwitter, value); }
+        }
+        
+        public bool IsNotify
+        {
+            get { return notify.IsEnabled; }
+            set
+            {
+                if (value == notify.IsEnabled) return;
+
+                notify.IsEnabled = value;
+                RaisePropertyChanged();
+            }
         }
 
         public Screen[] Desktops
