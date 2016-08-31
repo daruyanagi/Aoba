@@ -1,0 +1,47 @@
+﻿<Window x:Class="Aoba.Views.TwitterPostWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Aoba.Views"
+        mc:Ignorable="d"
+        x:Name="PostTweetWindow"
+        Title="Post tweet" Width="400" Topmost="True" SizeToContent="Height">
+    
+    <Window.Resources>
+        <Style TargetType="StackPanel">
+            <Setter Property="Margin" Value="6" />
+        </Style>
+
+        <Style TargetType="Button">
+            <Setter Property="Margin" Value="6" />
+            <Setter Property="Padding" Value="6" />
+            <Setter Property="Width" Value="72" />
+        </Style>
+
+        <Style TargetType="TextBlock">
+            <Setter Property="Margin" Value="6" />
+        </Style>
+
+        <Style TargetType="TextBox">
+            <Setter Property="Margin" Value="6" />
+        </Style>
+    </Window.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="300" />
+            <RowDefinition Height="80" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <Image Grid.Row="0" Source="{Binding Path}" />
+        
+        <TextBox Grid.Row="1" Text="{Binding Message}" />
+
+        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right">
+            <Button Command="{Binding CloseCommand}" CommandParameter="{Binding ElementName=PostTweetWindow}">Cancel</Button>
+            <Button Command="{Binding TwitterPostCommand}" CommandParameter="{Binding ElementName=PostTweetWindow}">Post</Button>
+        </StackPanel>
+    </Grid>
+</Window>
