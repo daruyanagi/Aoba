@@ -26,7 +26,7 @@
     <UpdatePeriodically>false</UpdatePeriodically>
     <UpdateRequired>false</UpdateRequired>
     <MapFileExtensions>true</MapFileExtensions>
-    <InstallUrl>https://cdn.rawgit.com/daruyanagi/Aoba/master/Aoba/Aoba/publish/</InstallUrl>
+    <InstallUrl>https://rawgit.com/daruyanagi/Aoba/master/Aoba/Aoba/publish/</InstallUrl>
     <ApplicationRevision>0</ApplicationRevision>
     <ApplicationVersion>1.4.2.0</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
