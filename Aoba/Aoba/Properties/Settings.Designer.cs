@@ -25,7 +25,7 @@ namespace Aoba.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("S1jqYgKzykOHOVKF0tsiPiON1")]
+        [global::System.Configuration.DefaultSettingValueAttribute("EECjCaJCsOYuYjYKQroj4GzfY")]
         public string ConsumerKey {
             get {
                 return ((string)(this["ConsumerKey"]));
@@ -37,7 +37,7 @@ namespace Aoba.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("ahzxbdTNXKMNoanwDzgQtRT9Q4W0jHHbrIFRE4AAMv5y5tTXtX")]
+        [global::System.Configuration.DefaultSettingValueAttribute("v53IcEN8Nuz8bH83XT7zuXvKYQMGD2lqy2ZIN0adhOmfTpHJUy")]
         public string ConsumerSecret {
             get {
                 return ((string)(this["ConsumerSecret"]));
