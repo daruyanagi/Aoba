@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Aoba.Views"
         mc:Ignorable="d"
-        Title="Authorize Twitter" Height="300" Width="300" Topmost="True" SizeToContent="WidthAndHeight" >
+        Title="Authorize Twitter" Height="300" Width="300" Topmost="True" SizeToContent="WidthAndHeight" WindowStyle="ToolWindow" ShowInTaskbar="False" >
 
     <Window.Resources>
         <Style TargetType="StackPanel">

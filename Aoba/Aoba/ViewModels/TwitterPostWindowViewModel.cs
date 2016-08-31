@@ -28,11 +28,14 @@ namespace Aoba.ViewModels
 
             TwitterPostCommand = new DelegateCommand(_ =>
             {
-                model.PostWithMedia(Message, new string[] { Path, });
+                var result = model.PostWithMedia(Message, new string[] { Path, });
 
-                var window = _ as System.Windows.Window;
+                if (result)
+                {
+                    var window = _ as System.Windows.Window;
 
-                window.Close();
+                    window.Close();
+                }
             });
         }
 
