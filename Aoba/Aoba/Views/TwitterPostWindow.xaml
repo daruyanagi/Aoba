@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:Aoba.Views"
         mc:Ignorable="d"
         x:Name="PostTweetWindow"
-        Title="Post tweet" Width="400" Topmost="True" SizeToContent="Height">
+        Title="Post tweet" Width="400" Topmost="True" SizeToContent="Height" WindowStyle="ToolWindow" ShowInTaskbar="False" >
     
     <Window.Resources>
         <Style TargetType="StackPanel">
@@ -37,7 +37,7 @@
 
         <Image Grid.Row="0" Source="{Binding Path}" />
         
-        <TextBox Grid.Row="1" Text="{Binding Message}" />
+        <TextBox Grid.Row="1" Text="{Binding Message}" AcceptsReturn="True" />
 
         <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right">
             <Button Command="{Binding CloseCommand}" CommandParameter="{Binding ElementName=PostTweetWindow}">Cancel</Button>

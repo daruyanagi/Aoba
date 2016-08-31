@@ -42,9 +42,11 @@ namespace Aoba.Models
                     Properties.Settings.Default.AccessTokenSecret
                 );
 
+                var temp = tokens.Account.VerifyCredentials();
+
                 return true;
             }
-            catch
+            catch (Exception e) // ネットワークエラーのときもクリアされちゃうの、どうしよっかな
             {
                 tokens = null;
 
@@ -124,9 +126,11 @@ namespace Aoba.Models
 
                 return true;
             }
-            catch
+            catch (Exception e)
             {
                 tokens = null;
+
+                notify.Toast(e.Message, "Aoba.png");
 
                 return false;
             }
