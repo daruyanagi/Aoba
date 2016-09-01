@@ -25,30 +25,6 @@ namespace Aoba.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("EECjCaJCsOYuYjYKQroj4GzfY")]
-        public string ConsumerKey {
-            get {
-                return ((string)(this["ConsumerKey"]));
-            }
-            set {
-                this["ConsumerKey"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("v53IcEN8Nuz8bH83XT7zuXvKYQMGD2lqy2ZIN0adhOmfTpHJUy")]
-        public string ConsumerSecret {
-            get {
-                return ((string)(this["ConsumerSecret"]));
-            }
-            set {
-                this["ConsumerSecret"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("")]
         public string AccessToken {
             get {
@@ -68,6 +44,30 @@ namespace Aoba.Properties {
             }
             set {
                 this["AccessTokenSecret"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("mKfSyjsnNXkr4Lu5OzTYJ49ib")]
+        public string ConsumerKey {
+            get {
+                return ((string)(this["ConsumerKey"]));
+            }
+            set {
+                this["ConsumerKey"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("7MTHPAciLB1mSByOohsMtl1nI1RAIevZrSgZc7PR2o0EiriEPy")]
+        public string ConsumerSecret {
+            get {
+                return ((string)(this["ConsumerSecret"]));
+            }
+            set {
+                this["ConsumerSecret"] = value;
             }
         }
     }
