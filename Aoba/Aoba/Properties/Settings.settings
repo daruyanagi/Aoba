@@ -2,17 +2,17 @@
 <SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="Aoba.Properties" GeneratedClassName="Settings">
   <Profiles />
   <Settings>
-    <Setting Name="ConsumerKey" Type="System.String" Scope="User">
-      <Value Profile="(Default)">S1jqYgKzykOHOVKF0tsiPiON1</Value>
-    </Setting>
-    <Setting Name="ConsumerSecret" Type="System.String" Scope="User">
-      <Value Profile="(Default)">ahzxbdTNXKMNoanwDzgQtRT9Q4W0jHHbrIFRE4AAMv5y5tTXtX</Value>
-    </Setting>
     <Setting Name="AccessToken" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
     <Setting Name="AccessTokenSecret" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="ConsumerKey" Type="System.String" Scope="User">
+      <Value Profile="(Default)">mKfSyjsnNXkr4Lu5OzTYJ49ib</Value>
+    </Setting>
+    <Setting Name="ConsumerSecret" Type="System.String" Scope="User">
+      <Value Profile="(Default)">7MTHPAciLB1mSByOohsMtl1nI1RAIevZrSgZc7PR2o0EiriEPy</Value>
     </Setting>
   </Settings>
 </SettingsFile>
