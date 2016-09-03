@@ -34,8 +34,11 @@ namespace Aoba.ViewModels
         public MainWindowViewModel()
         {
             CanTwitter = Models.Twitter.GetInstance().Initialize();
-            BurstCaptureInterval = 1000;
-            SelectedDesktop = 0;
+            if (Properties.Settings.Default.Notify)
+                Models.NotificationProvider.Enable();
+            else
+                Models.NotificationProvider.Disable();
+            SelectedDesktop = Properties.Settings.Default.SelectedDesktop;
 
             DetectCommand = new DelegateCommand(_ =>
             {
@@ -235,11 +238,12 @@ namespace Aoba.ViewModels
             get { return selectedDesktop; }
             set
             {
+                if (selectedDesktop == value) return;
+
                 SetProperty(ref selectedDesktop, value);
 
-                var game_area = Models.GameArea.GetInstance();
-
-                game_area.Screen = Screen.AllScreens[selectedDesktop];
+                var game_area = Models.GameArea.GetInstance().Screen = Screen.AllScreens[selectedDesktop];
+                Properties.Settings.Default.SelectedDesktop = value;
 
                 RaisePropertyChanged("Rectangle");
                 RaisePropertyChanged("CanCapture");

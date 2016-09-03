@@ -18,16 +18,36 @@ namespace Aoba.Models
 
         private VideoCaptureEngine()
         {
-            FrameRate = 10;
-
-            MediaType = MediaType.Avi;
+            // Initialize
         }
 
         private Recorder recorder = null;
 
-        public int FrameRate { get; set; }
+        public int FrameRate
+        {
+            get
+            {
+                return Properties.Settings.Default.FrameRate;
+            }
+            set
+            {
+                Properties.Settings.Default.FrameRate = value;
+                Properties.Settings.Default.Save();
+            }
+        }
 
-        public MediaType MediaType { get; set; }
+        public MediaType MediaType
+        {
+            get
+            {
+                return (MediaType) Properties.Settings.Default.VideoType;
+            }
+            set
+            {
+                Properties.Settings.Default.VideoType = (int) value;
+                Properties.Settings.Default.Save();
+            }
+        }
 
         public bool Recording { get { return recorder?.State == RecorderState.Recording; } }
 
