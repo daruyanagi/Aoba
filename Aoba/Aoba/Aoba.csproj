@@ -29,7 +29,7 @@
     <MapFileExtensions>true</MapFileExtensions>
     <InstallUrl>https://yanagi.blob.core.windows.net/aoba/</InstallUrl>
     <ApplicationRevision>0</ApplicationRevision>
-    <ApplicationVersion>1.4.8.0</ApplicationVersion>
+    <ApplicationVersion>1.5.0.0</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <PublishWizardCompleted>true</PublishWizardCompleted>
     <BootstrapperEnabled>true</BootstrapperEnabled>

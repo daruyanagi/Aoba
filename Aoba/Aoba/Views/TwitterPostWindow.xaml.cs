@@ -19,8 +19,6 @@ namespace Aoba.Views
     /// </summary>
     public partial class TwitterPostWindow : Window
     {
-        private ViewModels.TwitterPostWindowViewModel viewModel = null;
-
         public TwitterPostWindow() : base()
         {
             InitializeComponent();
