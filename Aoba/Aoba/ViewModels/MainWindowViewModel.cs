@@ -31,121 +31,72 @@ namespace Aoba.ViewModels
         public ICommand TwitterAuthorizeCommand { get; private set; }
         public ICommand TwitterPostCommand { get; private set; }
 
-        Timer BurstTimer = new Timer();
-        Recorder recorder = null;
-        string videoPath = string.Empty;
-
-        Models.TwitterProviderModel twitter = Models.TwitterProviderModel.GetInstance();
-        Models.NotifyProviderModel notify = Models.NotifyProviderModel.GetInstance();
-
         public MainWindowViewModel()
         {
+            CanTwitter = Models.Twitter.GetInstance().Initialize();
             BurstCaptureInterval = 1000;
-
-            BurstTimer.Tick += (sender, args) =>
-            {
-                var path = GeneratePicturePath();
-
-                try
-                {
-                    CaptureGameArea(path);
-                }
-                catch
-                {
-                    BurstTimer.Stop();
-                }
-            };
-            
-            CanTwitter = twitter.Initialize();
+            SelectedDesktop = 0;
 
             DetectCommand = new DelegateCommand(_ =>
             {
-                var bitmap = CaptureDesktop(SelectedDesktop);
+                var game_area = Models.GameArea.GetInstance();
 
-                try
-                {
-                    Rectangle = DetectGameArea(bitmap);
-                    
-                    notify.Toast("Game Area is detected successfully.", "Aoba.png");
-                    CanCapture = true;
-                }
-                catch (Exception e)
-                {
-                    notify.Toast(e.Message, "Aoba.png");
-                    CanCapture = false;
-                }
+                game_area.Detect(game_area.Screen);
+
+                RaisePropertyChanged("CanCapture");
             });
-
-            VideoCaptureCommand = new DelegateCommand(_ =>
-            {
-                // video - c# Screna: How do I define screen area? - Stack Overflow
-                // http://stackoverflow.com/questions/35505744/c-sharp-screna-how-do-i-define-screen-area
-
-                if (recorder == null)
-                {
-                    videoPath = GenerateVideoPath();
-                    var writer = new AviWriter(videoPath, AviCodec.MotionJpeg);
-                    var videoProvider = new RegionProvider(Rectangle);
-                    var audioProvider = new LoopbackProvider();
-
-                    recorder = new Recorder(writer, videoProvider, FrameRate, audioProvider);
-
-                    recorder.Start();
-
-                    VideoCaptureButtonBackgroundBrush = new Media.SolidColorBrush(Media.Colors.Orange);
-                }
-                else
-                {
-                    recorder.Stop();
-
-                    recorder = null;
-
-                    VideoCaptureButtonBackgroundBrush = new Media.SolidColorBrush(Media.Colors.Black);
-
-                    notify.Toast($"{videoPath} is saved.", "Aoba.png", (s, a) => { Process.Start("explorer", $"/select,\"{videoPath}\""); });
-                }
-            }, _ => CanCapture && SelectedDesktop == 0);
 
             SingleCaptureCommand = new DelegateCommand(_ =>
             {
-                try
-                {
-                    var path = GeneratePicturePath();
-                    CaptureGameArea(path);
-                    notify.Toast($"{path} is saved.", path, (s, a) => { Process.Start("explorer", $"/select,\"{path}\""); });
-                }
-                catch (Exception e)
-                {
-                    notify.Toast(e.Message, "Aoba.png");
-                }
-            }, _ => CanCapture);
+                var engine = Models.SingleImageCaptureEngine.GetInstance();
+
+                engine.Save();
+            },
+            _ => CanCapture);
 
             BurstCaptureCommand = new DelegateCommand(_ =>
             {
-                if (BurstTimer.Enabled)
-                {
-                    BurstTimer.Stop();
-                    BurstCaptureButtonBackgroundBrush = new Media.SolidColorBrush(Media.Colors.Black);
+                var engine = Models.BurstImageCaptureEngine.GetInstance();
 
-                    notify.Toast("Burst capture is stopped.", "Aoba.png", (s, a) => { Process.Start("explorer", PictureStoragePath); });
+                if (!engine.Recording)
+                {
+                    engine.Start();
+                    BurstCaptureButtonBackgroundBrush = new Media.SolidColorBrush(Media.Colors.Orange);
                 }
                 else
                 {
-                    BurstTimer.Start();
-                    BurstCaptureButtonBackgroundBrush = new Media.SolidColorBrush(Media.Colors.Orange);
-
-                    notify.Toast("Burst capture is started.", "AobaPng", (s, a) => { Process.Start("explorer", PictureStoragePath); });
+                    engine.Stop();
+                    BurstCaptureButtonBackgroundBrush = new Media.SolidColorBrush(Media.Colors.Black);
                 }
-            }, _ => CanCapture);
+            },
+            _ => CanCapture);
+
+            VideoCaptureCommand = new DelegateCommand(_ =>
+            {
+                var engine = Models.VideoCaptureEngine.GetInstance();
+
+                if (!engine.Recording)
+                {
+                    engine.Start();
+                    VideoCaptureButtonBackgroundBrush = Media.Brushes.Orange;
+                }
+                else
+                {
+                    engine.Stop();
+                    VideoCaptureButtonBackgroundBrush = Media.Brushes.Black;
+                }
+
+            },
+            _ => CanCapture && Screen.AllScreens[SelectedDesktop].Primary);
 
             OpenPictureFolderCommand = new DelegateCommand(_ =>
             {
-                Process.Start(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyPictures), "Aoba"));
+                Process.Start(Models.MediaPathProvider.GetPictureFolder());
             });
 
             OpenVideoFolderCommand = new DelegateCommand(_ =>
             {
-                Process.Start(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyVideos), "Aoba"));
+                Process.Start(Models.MediaPathProvider.GetVideoFolder());
             });
 
             TwitterAuthorizeCommand = new DelegateCommand(_ =>
@@ -153,29 +104,22 @@ namespace Aoba.ViewModels
                 var window = new Views.TwitterAuthWindow();
 
                 window.ShowDialog();
-                
-                CanTwitter = twitter.IsEnabed;
+
+                CanTwitter = Models.Twitter.GetInstance().IsEnabed;
             });
 
-            TwitterPostCommand = new DelegateCommand(
-                _ => {
-                    var path = GeneratePicturePath();
-                    CaptureGameArea(path);
-
-                    var window = new Views.TwitterPostWindow(path);
-                    window.ShowDialog();
-                },
-                _ => CanTwitter && CanCapture
-            );
+            TwitterPostCommand = new DelegateCommand(_ =>
+            {
+                Models.SingleImageCaptureEngine.GetInstance().Save();
+                var window = new Views.TwitterPostWindow();
+                window.ShowDialog();
+            },
+            _ => CanTwitter && CanCapture /* && Models.MediaPathProvider.GetHistory().Count > 0 */);
         }
 
-        private void CaptureGameArea(string path)
+        public string Title
         {
-            var bitmap = CaptureDesktop(SelectedDesktop);
-
-            bitmap = bitmap.Clone(Rectangle, bitmap.PixelFormat);
-            
-            bitmap.Save(path);
+            get { return $"Aoba {System.Reflection.Assembly.GetExecutingAssembly().GetName().Version}"; }
         }
 
         private Media.Brush burstCaptureButtonBackgroundBrush = new Media.SolidColorBrush(Media.Colors.Black);
@@ -196,39 +140,53 @@ namespace Aoba.ViewModels
 
         public int BurstCaptureInterval
         {
-            get { return BurstTimer.Interval; }
+            get
+            {
+                var engine = Models.BurstImageCaptureEngine.GetInstance();
+                return engine.Interval;
+            }
             set
             {
-                if (BurstTimer.Interval == value) return;
+                var engine = Models.BurstImageCaptureEngine.GetInstance();
 
-                BurstTimer.Interval = value;
+                if (engine.Interval == value) return;
+
+                engine.Interval = value;
                 RaisePropertyChanged();
             }
         }
 
-        private int frameRate = 10;
-
         public int FrameRate
         {
-            get { return frameRate; }
-            set { SetProperty(ref frameRate, value);  }
-        }
+            get
+            {
+                var engine = Models.VideoCaptureEngine.GetInstance();
+                return engine.FrameRate;
+            }
+            set
+            {
+                var engine = Models.VideoCaptureEngine.GetInstance();
 
-        private Rectangle rectangle;
+                if (engine.FrameRate == value) return;
+
+                engine.FrameRate = value;
+                RaisePropertyChanged();
+            }
+        }
 
         public Rectangle Rectangle
         {
-            get { return rectangle; }
-            set { SetProperty(ref rectangle, value); }
+            get
+            {
+                var game_area = Models.GameArea.GetInstance();
+
+                return game_area.Rects == null || game_area.Rects.Length == 0
+                    ? Rectangle.Empty
+                    : game_area.Rects.First();
+            }
         }
 
-        private bool canCapture = false;
-
-        public bool CanCapture
-        {
-            get { return canCapture; }
-            set { SetProperty(ref canCapture, value); }
-        }
+        public bool CanCapture { get { return !Rectangle.IsEmpty; } }
 
         private bool canTwitter = false;
 
@@ -240,12 +198,16 @@ namespace Aoba.ViewModels
         
         public bool IsNotify
         {
-            get { return notify.IsEnabled; }
+            get { return Models.NotificationProvider.IsEnabled(); }
             set
             {
-                if (value == notify.IsEnabled) return;
+                if (value == Models.NotificationProvider.IsEnabled()) return;
 
-                notify.IsEnabled = value;
+                if (value)
+                    Models.NotificationProvider.Enable();
+                else
+                    Models.NotificationProvider.Disable();
+
                 RaisePropertyChanged();
             }
         }
@@ -253,6 +215,17 @@ namespace Aoba.ViewModels
         public Screen[] Desktops
         {
             get { return Screen.AllScreens; }
+        }
+
+        public Models.MediaType MediaType
+        {
+            get { return Models.VideoCaptureEngine.GetInstance().MediaType; }
+            set { Models.VideoCaptureEngine.GetInstance().MediaType = value; }
+        }
+
+        public Models.MediaType[] MediaTypes
+        {
+            get { return new Models.MediaType[] { Models.MediaType.Avi, Models.MediaType.Gif, }; }
         }
 
         private int selectedDesktop = 0;
@@ -264,136 +237,13 @@ namespace Aoba.ViewModels
             {
                 SetProperty(ref selectedDesktop, value);
 
-                CanCapture = false;
-                Rectangle = Rectangle.Empty;
+                var game_area = Models.GameArea.GetInstance();
+
+                game_area.Screen = Screen.AllScreens[selectedDesktop];
+
+                RaisePropertyChanged("Rectangle");
+                RaisePropertyChanged("CanCapture");
             }
-        }
-
-        public string PictureStoragePath
-        {
-            get
-            {
-                var path = System.Environment.GetFolderPath(Environment.SpecialFolder.MyPictures);
-
-                path = Path.Combine(path, "Aoba");
-
-                path = Path.Combine(path, DateTime.Now.ToString("yyyy-MM-dd"));
-
-                if (!Directory.Exists(path)) Directory.CreateDirectory(path);
-
-                return path;
-            }
-        }
-
-        public string VideoStoragePath
-        {
-            get
-            {
-                var path = System.Environment.GetFolderPath(Environment.SpecialFolder.MyVideos);
-
-                path = Path.Combine(path, "Aoba");
-
-                path = Path.Combine(path, DateTime.Now.ToString("yyyy-MM-dd"));
-
-                if (!Directory.Exists(path)) Directory.CreateDirectory(path);
-
-                return path;
-            }
-        }
-
-        public string GeneratePicturePath(string extension = "png")
-        {
-            var path = PictureStoragePath;
-
-            path = System.IO.Path.Combine(path, DateTime.Now.ToString("HHmmss-ff"));
-            path = System.IO.Path.ChangeExtension(path, extension);
-
-            return path;
-        }
-
-        public string GenerateVideoPath(string extension = "avi")
-        {
-            var path = VideoStoragePath;
-
-            path = System.IO.Path.Combine(path, DateTime.Now.ToString("HHmmss-ff"));
-            path = System.IO.Path.ChangeExtension(path, extension);
-
-            return path;
-        }
-
-        private static Bitmap CaptureDesktop(int screen = 0)
-        {
-            var rect = Screen.AllScreens[screen].Bounds;
-
-            var bitmap = new Bitmap(
-                rect.Width, rect.Height, 
-                PixelFormat.Format32bppArgb
-            );
-
-            using (Graphics g = Graphics.FromImage(bitmap))
-            {
-                g.CopyFromScreen(
-                    rect.X, rect.Y, 0, 0, rect.Size, 
-                    CopyPixelOperation.SourceCopy
-                );
-            }
-
-            return bitmap;
-        }
-
-        private static Rectangle DetectGameArea(Bitmap desktop)
-        {
-            for (int x = 1; x < desktop.Width - 1; x++)
-            {
-                for (int y = 1; y < desktop.Height - 1; y++)
-                {
-                    if (desktop.GetPixel(x, y).Name != "ffffffff" &&
-                        desktop.GetPixel(x - 1, y).Name == "ffffffff" &&
-                        desktop.GetPixel(x, y - 1).Name == "ffffffff" &&
-                        desktop.GetPixel(x - 1, y - 1).Name == "ffffffff")
-                    {
-                        int w = 0;
-                        try
-                        {
-                            while (desktop.GetPixel(x + w, y).Name != "ffffffff")
-                            {
-                                w++;
-                            }
-
-                            if (w < 800) continue;
-                        }
-                        catch
-                        {
-                            continue;
-                        }
-
-                        int h = 0;
-
-                        try
-                        {
-                            while (desktop.GetPixel(x, y + h).Name != "ffffffff")
-                            {
-                                h++;
-                            }
-
-                            if (h < 480) continue;
-                        }
-                        catch
-                        {
-                            continue;
-                        }
-
-                        if (desktop.GetPixel(x + w + 1, y).Name == "ffffffff" &&
-                            desktop.GetPixel(x, y + h + 1).Name == "ffffffff" &&
-                            desktop.GetPixel(x + w + 1, y + h + 1).Name == "ffffffff")
-                        {
-                            if (w > h) return new Rectangle(x, y, w, h);
-                        }
-                    }
-                }
-            }
-
-            throw new Exception("Game Area is not found.");
         }
     }
 }

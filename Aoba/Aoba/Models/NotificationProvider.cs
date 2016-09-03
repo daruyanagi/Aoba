@@ -9,26 +9,16 @@ using Windows.UI.Notifications;
 
 namespace Aoba.Models
 {
-    public sealed class NotifyProviderModel
+    public static class NotificationProvider
     {
-        private static NotifyProviderModel instance = new NotifyProviderModel();
+        private static bool is_enabled = true;
 
-        public static NotifyProviderModel GetInstance()
-        {
-            return instance;
-        }
-
-        public NotifyProviderModel()
-        {
-            IsEnabled = true;
-        }
-
-        public void Toast(string message, string image_path,
+        public static void Toast(string message, string image_path,
             TypedEventHandler<ToastNotification, object> activated = null,
             TypedEventHandler<ToastNotification, ToastDismissedEventArgs> dismissed = null,
             TypedEventHandler<ToastNotification, ToastFailedEventArgs> failed = null)
         {
-            if (!IsEnabled) return;
+            if (!is_enabled) return;
 
             var toastXml = ToastNotificationManager.GetTemplateContent(ToastTemplateType.ToastImageAndText04);
 
@@ -48,7 +38,20 @@ namespace Aoba.Models
 
             ToastNotificationManager.CreateToastNotifier(APP_ID).Show(toast);
         }
-        
-        public bool IsEnabled { get; set; }
+
+        public static bool IsEnabled()
+        {
+            return is_enabled;
+        }
+
+        public static void Enable()
+        {
+            is_enabled = true;
+        }
+
+        public static void Disable()
+        {
+            is_enabled = false;
+        }
     }
 }

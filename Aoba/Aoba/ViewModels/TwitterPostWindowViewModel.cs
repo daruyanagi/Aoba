@@ -11,13 +11,15 @@ namespace Aoba.ViewModels
     class TwitterPostWindowViewModel : ViewModelBase
     {
         public DelegateCommand CloseCommand { get; private set; }
+        public DelegateCommand BackCommand { get; private set; }
+        public DelegateCommand NextCommand { get; private set; }
         public DelegateCommand TwitterPostCommand { get; private set; }
 
-        private Models.TwitterProviderModel model = Models.TwitterProviderModel.GetInstance();
+        private Models.Twitter model = Models.Twitter.GetInstance();
 
-        public TwitterPostWindowViewModel(string path) : base()
+        public TwitterPostWindowViewModel()
         {
-            Path = path;
+            Pictures = Models.MediaPathProvider.GetHistory();
 
             CloseCommand = new DelegateCommand(_ =>
             {
@@ -26,9 +28,13 @@ namespace Aoba.ViewModels
                 window.Close();
             });
 
+            BackCommand = new DelegateCommand(_ => Index++, _ => Index < Pictures.Count - 1);
+
+            NextCommand = new DelegateCommand(_ => Index--, _ => 0 < Index);
+
             TwitterPostCommand = new DelegateCommand(_ =>
             {
-                var result = model.PostWithMedia(Message, new string[] { Path, });
+                var result = model.PostWithMedia(Message, new string[] { SelectedPicture, });
 
                 if (result)
                 {
@@ -39,12 +45,27 @@ namespace Aoba.ViewModels
             });
         }
 
-        private string path = string.Empty;
+        private string selectedPicture = string.Empty;
 
-        public string Path
+        public string SelectedPicture
         {
-            get { return path; }
-            set { SetProperty(ref path, value); }
+            get { return Pictures[Index]; }
+        }
+
+        private int index = 0;
+
+        public int Index
+        {
+            get { return index; }
+            set { SetProperty(ref index, value); RaisePropertyChanged("SelectedPicture"); }
+        }
+
+        private List<string> pictures = null;
+
+        public List<string> Pictures
+        {
+            get { return pictures; }
+            set { SetProperty(ref pictures, value); }
         }
 
         private string message = string.Empty;
