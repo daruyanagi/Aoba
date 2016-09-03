@@ -8,9 +8,9 @@ namespace Aoba.Models
 {
     public enum MediaType
     {
-        Png,
-        Gif,
-        Avi,
-        Mp4,
+        Png = 0,
+        Gif = 1,
+        Avi = 2,
+        Mp4 = 3,
     }
 }
