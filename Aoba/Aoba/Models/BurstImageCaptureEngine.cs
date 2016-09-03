@@ -16,6 +16,8 @@ namespace Aoba.Models
 
         private BurstImageCaptureEngine()
         {
+            Interval = Properties.Settings.Default.BurstInterval;
+
             timer.Tick += (sender, args) =>
             {
                 var engine = SingleImageCaptureEngine.GetInstance();
@@ -26,12 +28,18 @@ namespace Aoba.Models
             };
         }
 
-        private DispatcherTimer timer = new DispatcherTimer() { Interval = TimeSpan.FromMilliseconds(1000), };
+        private DispatcherTimer timer = new DispatcherTimer();
 
         public int Interval
         {
             get { return (int) timer.Interval.TotalMilliseconds; }
-            set { timer.Interval = TimeSpan.FromMilliseconds(value); }
+            set
+            {
+                if (Interval == value) return;
+
+                timer.Interval = TimeSpan.FromMilliseconds(value);
+                Properties.Settings.Default.BurstInterval = value;
+            }
         }
 
         public bool Recording

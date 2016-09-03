@@ -17,7 +17,7 @@ namespace Aoba.Models
 
         private SingleImageCaptureEngine()
         {
-
+            // MediaType を変更できるようにする？
         }
 
         public bool Save()
