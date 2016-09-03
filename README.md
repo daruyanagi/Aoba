@@ -5,7 +5,7 @@
 「艦これ」のゲーム画面を保存します。白いエリアに囲まれた 800x480 ピクセル以上の領域を自動で検知できるので、「とうらぶ」などの他のブラウザーゲームの画面もキャプチャーできるようです。
 
 - [開発ブログ](http://daruyanagi.jp/archive/category/Aoba)
-- [ダウンロード](https://github.com/daruyanagi/Aoba/blob/master/Aoba/Aoba/publish/setup.exe?raw=true)
+- [ダウンロード](https://yanagi.blob.core.windows.net/aoba/setup.exe)
 
 ## 主な機能
 
@@ -13,6 +13,7 @@
 - バースト画像キャプチャー（連写）機能：マルチスクリーン対応
 - 動画キャプチャー機能（音声付き、AVI のみ）：マルチスクリーン非対応
 - トースト通知機能
+- Twitter 投稿機能（v1.4.4）
 
 ## 基本的な使い方
 
@@ -24,4 +25,3 @@
 
 - GIF キャプチャー機能
 - YouTube への対応
-- Twitter 投稿機能
