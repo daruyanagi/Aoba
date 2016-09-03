@@ -10,18 +10,16 @@ using static CoreTweet.OAuth;
 
 namespace Aoba.Models
 {
-    public sealed class TwitterProviderModel
+    public sealed class Twitter
     {
-        private static TwitterProviderModel instance = new TwitterProviderModel();
+        private static Twitter instance = new Twitter();
 
-        private NotifyProviderModel notify = NotifyProviderModel.GetInstance();
-
-        public static TwitterProviderModel GetInstance()
+        public static Twitter GetInstance()
         {
             return instance;
         }
 
-        private TwitterProviderModel()
+        private Twitter()
         {
 
         }
@@ -92,15 +90,15 @@ namespace Aoba.Models
                 Properties.Settings.Default.AccessTokenSecret = tokens.AccessTokenSecret;
                 Properties.Settings.Default.Save();
 
-                notify.Toast("Authorization has completed successfully.", "Aoba.png");
+                NotificationProvider.Toast("Authorization has completed successfully.", "Aoba.png");
 
                 return true;
             }
             catch
             {
                 tokens = null;
-                
-                notify.Toast("Authorization failed.", "Aoba.png");
+
+                NotificationProvider.Toast("Authorization failed.", "Aoba.png");
 
                 return false;
             }
@@ -113,13 +111,15 @@ namespace Aoba.Models
                 if (message.Length > 140) throw new ArgumentException("message is too long");
                 if (path.Length > 4) throw new ArgumentException("path must be <= 4");
 
+                // とりあえず画像のみ
+
                 var media = path
                     .Select(_ => tokens.Media.Upload(media: new FileInfo(_)).MediaId)
                     .ToArray();
                 
                 var status = tokens.Statuses.Update(status: message, media_ids: media);
 
-                notify.Toast("Tweet is posted.", path.First(), (s, e) => 
+                NotificationProvider.Toast("Tweet is posted.", path.First(), (s, e) => 
                 {
                     Process.Start($"https://twitter.com/{status.User.ScreenName}/status/{status.Id}");
                 });
@@ -130,7 +130,7 @@ namespace Aoba.Models
             {
                 tokens = null;
 
-                notify.Toast(e.Message, "Aoba.png");
+                NotificationProvider.Toast(e.Message, "Aoba.png");
 
                 return false;
             }

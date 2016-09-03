@@ -142,8 +142,17 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="Models\NotifyProviderModel.cs" />
-    <Compile Include="Models\TwitterProviderModel.cs" />
+    <Compile Include="Models\BurstImageCaptureEngine.cs" />
+    <Compile Include="Models\GameArea.cs" />
+    <Compile Include="Models\MediaPathProvider.cs" />
+    <Compile Include="Models\MediaType.cs" />
+    <Compile Include="Models\NotificationProvider.cs" />
+    <Compile Include="Models\SingleImageCaptureEngine.cs" />
+    <Compile Include="Models\Twitter.cs" />
+    <Compile Include="Models\VideoCaptureEngine.cs" />
+    <Compile Include="UserControls\AnimationFactory.cs" />
+    <Compile Include="UserControls\FlipView.cs" />
+    <Compile Include="UserControls\FlipViewPanel.cs" />
     <Compile Include="ViewModelBase.cs" />
     <Compile Include="ViewModels\MainWindowViewModel.cs" />
     <Compile Include="ViewModels\TwitterAuthWindowViewModel.cs" />

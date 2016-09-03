@@ -4,9 +4,10 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Aoba.Views"
+        xmlns:controls="clr-namespace:Aoba.UserControls"
         mc:Ignorable="d"
         x:Name="PostTweetWindow"
-        Title="Post tweet" Width="400" Topmost="True" SizeToContent="Height" WindowStyle="ToolWindow" ShowInTaskbar="False" >
+        Title="Post tweet" Width="480" Topmost="True" SizeToContent="Height" WindowStyle="ToolWindow" ShowInTaskbar="False" ResizeMode="NoResize" >
     
     <Window.Resources>
         <Style TargetType="StackPanel">
@@ -30,12 +31,44 @@
 
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="300" />
+            <RowDefinition Height="*" />
             <RowDefinition Height="80" />
-            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        <Image Grid.Row="0" Source="{Binding Path}" />
+        <Grid Grid.Row="0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+            
+            <Image Margin="0" Source="{Binding SelectedPicture}"
+                   Stretch="Uniform"/>
+            <Button HorizontalAlignment="Left" Height="36" 
+                    Margin="0" BorderBrush="Transparent" 
+                    Command="{Binding BackCommand}">&lt;</Button>
+            <Button HorizontalAlignment="Right" Height="36" 
+                    Margin="0" BorderBrush="Transparent"
+                    Command="{Binding NextCommand}">&gt;</Button>
+        </Grid>
+
+        <!--<controls:FlipView Grid.Row="0"
+                           ItemsSource="{Binding Pictures}"
+                           SelectedIndex="0">
+            <controls:FlipView.ItemTemplate>
+                <DataTemplate>
+                    <Image Source="{Binding}"
+                           Stretch="Fill"/>
+                </DataTemplate>
+            </controls:FlipView.ItemTemplate>
+        </controls:FlipView>
+
+        <ListBox Grid.Row="0" ItemsSource="{Binding Pictures}" >
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <Image Source="{Binding}" />
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>-->
         
         <TextBox Grid.Row="1" Text="{Binding Message}" AcceptsReturn="True" />
 

@@ -21,13 +21,11 @@ namespace Aoba.Views
     {
         private ViewModels.TwitterPostWindowViewModel viewModel = null;
 
-        public TwitterPostWindow(string path) : base()
+        public TwitterPostWindow() : base()
         {
             InitializeComponent();
 
-            viewModel = new ViewModels.TwitterPostWindowViewModel(path);
-
-            DataContext = viewModel;
+            DataContext = new ViewModels.TwitterPostWindowViewModel();
         }
 
         private void CloseButton_Click(object sender, RoutedEventArgs e)

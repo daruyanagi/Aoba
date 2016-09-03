@@ -14,7 +14,7 @@ namespace Aoba.ViewModels
         public ICommand GetPinCodeCommand { get; private set; }
         public ICommand GetTokensCommand { get; private set; }
 
-        private Models.TwitterProviderModel model = Models.TwitterProviderModel.GetInstance();
+        private Models.Twitter model = Models.Twitter.GetInstance();
         // private Models.NotifyProviderModel notify = Models.NotifyProviderModel.GetInstance();
 
         public TwitterAuthWindowViewModel()
