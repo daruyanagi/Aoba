@@ -231,7 +231,7 @@ namespace Aoba.ViewModels
             get { return new Models.MediaType[] { Models.MediaType.Avi, Models.MediaType.Gif, }; }
         }
 
-        private int selectedDesktop = 0;
+        private int selectedDesktop = -1;
 
         public int SelectedDesktop
         {

@@ -30,7 +30,7 @@ namespace Aoba.Models
         public static List<string> GetHistory()
         {
             // 履歴を呼び出すタイミングで、存在しないファイルをはじいておく
-            history = history.Where(_ => File.Exists(_)).ToList();
+            history = history.Where(_ => File.Exists(_)).OrderByDescending(_ => _).ToList();
 
             return history;
         }
