@@ -13,5 +13,6 @@ namespace Aoba
     /// </summary>
     public partial class App : Application
     {
+		// なにかする
     }
 }
